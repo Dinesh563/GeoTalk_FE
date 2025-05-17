@@ -4,6 +4,8 @@ import Header from "./Header.js"
 import Footer from './Footer';
 import MessageList from './Messages';
 import MessageSendBox from './MessageSendBox';
+import MessageCard from './components/MessageCard';
+import AlertScroll from './components/AlertScroll';
 
 function App() {
   const [locationStatus, setLocationStatus] = useState("Loading");
@@ -30,11 +32,11 @@ function App() {
     );
   }, []);
 
-
   return (
     <div className="App">
-      <Header locationStatus={locationStatus} coords={coords}/>
-      <MessageList locationStatus={locationStatus} coords={coords} setLocationStatus={setLocationStatus}/>
+      <Header locationStatus={locationStatus} coords={coords} />
+      <AlertScroll message="Please note that the messages will be expired after 5 minutes"/>
+      <MessageList locationStatus={locationStatus} coords={coords} setLocationPermission={setLocationStatus} />
       <MessageSendBox />
       <Footer />
     </div>

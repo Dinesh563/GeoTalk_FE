@@ -6,10 +6,12 @@ module.exports = {
     extend: {
       scrollBehavior: ["responsive"],
       animation: {
+        expire: 'expire 1.5s ease-in-out forwards',
+        'pulse-gentle': 'pulse-gentle 3s infinite ease-in-out',
         fadeout: "fadeout 1s ease-in-out",
         spreadout: 'spreadout 1s ease-in-out forwards',
         fadeIn: 'fadeIn 0.5s ease-out forwards',
-        spin: 'spin 1s linear infinite'
+        spin: 'spin 1s linear infinite',
       },
       keyframes: {
         spreadout: {
@@ -43,6 +45,28 @@ module.exports = {
         spin: {
           '0%': { transform: 'rotate(0deg)' },
           '100%': { transform: 'rotate(360deg)' },
+        },
+        expire: {
+          '0%': {
+            opacity: '1',
+            transform: 'scale(1)'
+          },
+          '70%': {
+            opacity: '0.5',
+            transform: 'scale(0.95)'
+          },
+          '100%': {
+            opacity: '0',
+            transform: 'scale(0.9) translateY(20px)',
+            height: '0',
+            margin: '0',
+            padding: '0',
+            overflow: 'hidden'
+          }
+        },
+        'pulse-gentle': {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.85' }
         }
       },
     },

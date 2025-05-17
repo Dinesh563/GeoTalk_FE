@@ -1,14 +1,19 @@
 import React, { useState, useEffect } from 'react';
+import MessageCard from './components/MessageCard';
+import MessageCard2 from './components/MessageCard2';
 
-const MessageList = ({ locationStatus, coords, setLocationStatus }) => {
+const MessageList = ({ locationStatus, coords, setLocationPermission }) => {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [locationPermission, setLocationPermission] = useState('loading'); // 'granted', 'denied', 'loading'
+  // const [locationPermission, setLocationPermission] = useState('loading'); // 'granted', 'denied', 'loading'
   const [coordinates, setCoordinates] = useState({ latitude: null, longitude: null });
 
   // permission and fetch coordinates
   useEffect(() => {
+    console.log("use hook running")
+
+
     if (locationStatus === 'granted') {
       setLocationPermission('granted');
       setCoordinates({ latitude: coords.lat, longitude: coords.lon });
@@ -46,7 +51,7 @@ const MessageList = ({ locationStatus, coords, setLocationStatus }) => {
       }));
 
 
-      setMessages(transformed);
+      setMessages(data);
       setError(null);
     } catch (error) {
       console.error('Error fetching messages:', error);
@@ -58,7 +63,7 @@ const MessageList = ({ locationStatus, coords, setLocationStatus }) => {
 
   // Retry getting location
   const retryLocationPermission = () => {
-    setLocationPermission('loading');
+    // setLocationPermission('loading');
     setError(null);
     setIsLoading(true);
 
@@ -82,7 +87,7 @@ const MessageList = ({ locationStatus, coords, setLocationStatus }) => {
 
   // Manual refresh button handler
   const handleRefresh = () => {
-    if (locationPermission === 'granted' && coordinates.latitude && coordinates.longitude) {
+    if (locationStatus === 'granted' && coordinates.latitude && coordinates.longitude) {
       fetchMessages(coordinates.latitude, coordinates.longitude);
     } else {
       retryLocationPermission();
@@ -98,7 +103,7 @@ const MessageList = ({ locationStatus, coords, setLocationStatus }) => {
 
 
   // Render location permission denied state
-  if (locationPermission === 'denied') {
+  if (locationStatus === 'denied') {
     return (
       <div className="flex flex-col items-center justify-center p-8 m-8 mx-auto max-w-[90%] w-[700px] min-h-[300px] rounded-xl shadow-lg bg-gradient-to-r from-red-300 to-pink-200 text-pink-900 text-center">
         <div className="mb-4 text-pink-800">
@@ -177,7 +182,7 @@ const MessageList = ({ locationStatus, coords, setLocationStatus }) => {
             <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
             <circle cx="12" cy="10" r="3"></circle>
           </svg>
-          <span>Location active</span>
+          <span>{locationStatus}</span>
         </div>
 
         <button
@@ -195,40 +200,13 @@ const MessageList = ({ locationStatus, coords, setLocationStatus }) => {
       </div>
 
       <div className="space-y-4">
-        {messages.map((message, index) => (
+        {messages.map((item, index) => (
           <div
-            key={message.id || index}
-            className="flex gap-4 p-5 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1 animate-[fadeIn_0.5s_ease-out_forwards] opacity-0"
+            key={item.id || index}
+            className="flex gap-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1 animate-[fadeIn_0.5s_ease-out_forwards] opacity-0"
             style={{ animationDelay: `${index * 0.1}s` }}
           >
-            <div className="flex-shrink-0 w-12 h-12 flex items-center justify-center rounded-full bg-gradient-to-r from-indigo-600 to-blue-500 text-white text-lg font-bold">
-              {message.username ? message.username.charAt(0).toUpperCase() : 'A'}
-            </div>
-
-            <div className="flex-grow overflow-hidden">
-              <div className="flex justify-between items-center mb-2">
-                <h3 className="font-semibold text-gray-800">{message.username || 'Anonymous'}</h3>
-                <span className="text-xs text-gray-500">
-                  {message.timestamp ? new Date(message.timestamp).toLocaleString() : 'Just now'}
-                </span>
-              </div>
-
-              <p className="text-gray-700 whitespace-pre-wrap break-words">
-                {message.content}
-              </p>
-
-              <div className="flex items-center mt-3 text-xs text-gray-500">
-                <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5 mr-1" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
-                  <circle cx="12" cy="10" r="3"></circle>
-                </svg>
-                <span>
-                  {message.latitude && message.longitude
-                    ? `${message.latitude.toFixed(4)}, ${message.longitude.toFixed(4)}`
-                    : 'Location unknown'}
-                </span>
-              </div>
-            </div>
+            {true ? <MessageCard key={index} {...item} /> : <MessageCard2 key={index} {...item} />}
           </div>
         ))}
       </div>
