@@ -4,7 +4,6 @@ import Header from "./Header.js"
 import Footer from './Footer';
 import MessageList from './Messages';
 import MessageSendBox from './MessageSendBox';
-import MessageCard from './components/MessageCard';
 import AlertScroll from './components/AlertScroll';
 
 function App() {

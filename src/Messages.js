@@ -23,7 +23,7 @@ const MessageList = ({ locationStatus, coords, setLocationPermission }) => {
       setIsLoading(false);
       setError('Location permission denied.');
     }
-  }, [locationStatus, coords]);
+  }, [locationStatus, coords, setLocationPermission]);
 
   // Fetch messages from API
   const fetchMessages = async (latitude, longitude) => {
@@ -43,14 +43,7 @@ const MessageList = ({ locationStatus, coords, setLocationPermission }) => {
       }
 
       const data = await response.json();
-      console.log(data);
-
-      const transformed = data.map((key) => ({
-        username: "Dinesh",
-        content: JSON.stringify(key)
-      }));
-
-
+    
       setMessages(data);
       setError(null);
     } catch (error) {
@@ -93,14 +86,6 @@ const MessageList = ({ locationStatus, coords, setLocationPermission }) => {
       retryLocationPermission();
     }
   };
-
-  // Define keyframe animations for Tailwind
-  // Add this to your global CSS or use a package like tailwindcss-animate
-  const fadeInAnimation = "animate-[fadeIn_0.5s_ease-out_forwards]";
-  const spinAnimation = "animate-[spin_1s_ease-in-out_infinite]";
-
-
-
 
   // Render location permission denied state
   if (locationStatus === 'denied') {
