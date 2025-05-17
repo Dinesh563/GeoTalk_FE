@@ -3,6 +3,9 @@ import MessageCard from './components/MessageCard';
 import MessageCard2 from './components/MessageCard2';
 import Location from './components/Location';
 
+const BASE_URL = 'http://localhost:8443'
+const GetMessages = BASE_URL + '/msgs'
+
 const MessageList = ({ locationStatus, coords, setLocationPermission }) => {
   const [messages, setMessages] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -31,7 +34,7 @@ const MessageList = ({ locationStatus, coords, setLocationPermission }) => {
     try {
       setIsLoading(true);
       // Use the coordinates in the API call
-      const response = await fetch(`http://localhost:8443/msgs?latitude=${latitude}&longitude=${longitude}`, {
+      const response = await fetch(`${GetMessages}?latitude=${latitude}&longitude=${longitude}`, {
         method: 'GET',
         headers: {
           'Accept': 'application/json',

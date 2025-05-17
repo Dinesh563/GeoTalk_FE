@@ -1,9 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 
-const MessageSendBox = ({ onSendMessage }) => {
+
+
+const BASE_URL = 'http://localhost:8443'
+const PutMessagePath = BASE_URL + '/PutMessage'
+
+const MessageSendBox = () => {
   const [message, setMessage] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [locationStatus, setLocationStatus] = useState('checking'); // 'checking', 'granted', 'denied'
+  const [locationStatus, setLocationStatus] = useState('loading'); // 'loading', 'granted', 'denied'
   const [coordinates, setCoordinates] = useState({ latitude: null, longitude: null });
   const textareaRef = useRef(null);
 
@@ -15,35 +20,30 @@ const MessageSendBox = ({ onSendMessage }) => {
     }
   }, [message]);
 
-  // Check location permission on component mount
+  // Check location permission on mount
   useEffect(() => {
-    const checkLocationPermission = () => {
-      if (!navigator.geolocation) {
-        setLocationStatus('unavailable');
-        return;
+    if (!navigator.geolocation) {
+      setLocationStatus('unavailable');
+      return;
+    }
+
+    navigator.geolocation.getCurrentPosition(
+      (position) => {
+        setCoordinates({
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude
+        });
+        setLocationStatus('granted');
+      },
+      () => {
+        setLocationStatus('denied');
       }
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setCoordinates({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          });
-          setLocationStatus('granted');
-        },
-        () => {
-          setLocationStatus('denied');
-        }
-      );
-    };
-
-    checkLocationPermission();
+    );
   }, []);
 
   // Request location permission again
   const requestLocation = () => {
-    setLocationStatus('checking');
-    
+    setLocationStatus('loading');
     navigator.geolocation.getCurrentPosition(
       (position) => {
         setCoordinates({
@@ -61,26 +61,33 @@ const MessageSendBox = ({ onSendMessage }) => {
   // Handle message submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    if (!message.trim()) {
-      return;
-    }
-    
+
+    if (!message.trim()) return;
+
     if (locationStatus !== 'granted') {
       requestLocation();
       return;
     }
-    
+
     try {
       setIsLoading(true);
-      
-      await onSendMessage({
-        content: message,
+
+      const payload = {
         latitude: coordinates.latitude,
-        longitude: coordinates.longitude
+        longitude: coordinates.longitude,
+        message: message.trim()
+      };
+
+      const res = await fetch(PutMessagePath, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
-      
-      // Clear input after successful submission
+
+      if (!res.ok) {
+        throw new Error(`Server error: ${res.status}`);
+      }
+
       setMessage('');
       if (textareaRef.current) {
         textareaRef.current.style.height = 'auto';
@@ -92,17 +99,16 @@ const MessageSendBox = ({ onSendMessage }) => {
     }
   };
 
-  // Render location status indicator
   const renderLocationStatus = () => {
     switch (locationStatus) {
-      case 'checking':
+      case 'loading':
         return (
           <div className="flex items-center text-blue-500">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 mr-1 animate-pulse" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
               <circle cx="12" cy="10" r="3"></circle>
             </svg>
-            <span className="text-xs">Checking location...</span>
+            <span className="text-xs">loading location...</span>
           </div>
         );
       case 'granted':
@@ -112,7 +118,7 @@ const MessageSendBox = ({ onSendMessage }) => {
               <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
               <circle cx="12" cy="10" r="3"></circle>
             </svg>
-            <span className="text-xs">Location: Ready</span>
+            <span className="text-xs">Location: active</span>
           </div>
         );
       case 'denied':
@@ -122,10 +128,7 @@ const MessageSendBox = ({ onSendMessage }) => {
               <path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path>
               <circle cx="12" cy="10" r="3"></circle>
             </svg>
-            <button 
-              onClick={requestLocation} 
-              className="text-xs underline hover:text-red-600"
-            >
+            <button onClick={requestLocation} className="text-xs underline hover:text-red-600">
               Enable location
             </button>
           </div>
@@ -150,7 +153,7 @@ const MessageSendBox = ({ onSendMessage }) => {
       <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 border border-gray-100 dark:border-gray-700 transition-all duration-300">
         <form onSubmit={handleSubmit} className="space-y-3">
           <div className="relative">
-            <textarea 
+            <textarea
               ref={textareaRef}
               value={message}
               onChange={(e) => setMessage(e.target.value)}
@@ -162,25 +165,22 @@ const MessageSendBox = ({ onSendMessage }) => {
               {message.length} / 500
             </div>
           </div>
-          
+
           <div className="flex items-center justify-between">
             <div className="flex items-center space-x-4">
               {renderLocationStatus()}
-              
-              {/* Optional character count in mobile view */}
               <div className="hidden sm:block text-xs text-gray-400">
                 {message.length > 400 && <span className="text-amber-500">{500 - message.length} chars left</span>}
               </div>
             </div>
-            
-            <button 
-              type="submit" 
+
+            <button
+              type="submit"
               disabled={isLoading || locationStatus !== 'granted' || !message.trim()}
-              className={`px-5 py-2.5 rounded-lg font-medium flex items-center gap-2 transition-all duration-300 ${
-                isLoading || locationStatus !== 'granted' || !message.trim()
-                  ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
-                  : 'bg-gradient-to-r from-indigo-600 to-blue-500 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 transform'
-              }`}
+              className={`px-5 py-2.5 rounded-lg font-medium flex items-center gap-2 transition-all duration-300 ${isLoading || locationStatus !== 'granted' || !message.trim() || message.length > 500
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-gradient-to-r from-indigo-600 to-blue-500 text-white shadow-md hover:shadow-lg hover:-translate-y-0.5 transform'
+                }`}
             >
               {isLoading ? (
                 <>
