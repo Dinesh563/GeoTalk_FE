@@ -24,8 +24,8 @@ function Header(props) {
           </svg>
           <h1 className="text-xl font-bold text-gradient">GeoTalk</h1>
         </div>
-          <Location {...props} />
-          </div>
+        <Location {...props} />
+      </div>
     </header>
   );
 }

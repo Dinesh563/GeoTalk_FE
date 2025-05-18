@@ -34,10 +34,12 @@ function App() {
 
   return (
     <div className="App">
-      <Header locationStatus={locationStatus} coords={coords} />
-      <AlertScroll message="Please note that the messages will be expired after 5 minutes"/>
+      <div>
+        <Header locationStatus={locationStatus} coords={coords} />
+        <AlertScroll message="Please note that the messages will be expired after 5 minutes" />
+      </div>
       <MessageList locationStatus={locationStatus} coords={coords} setLocationPermission={setLocationStatus} messages={messages} setMessages={setMessages} />
-      <MessageSendBox locationStatus={locationStatus} coordinates={coords} setLocationPermission={setLocationStatus} setMessages={setMessages}/>
+      <MessageSendBox locationStatus={locationStatus} coordinates={coords} setLocationPermission={setLocationStatus} setMessages={setMessages} />
       <Footer />
     </div>
   );
