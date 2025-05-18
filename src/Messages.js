@@ -166,7 +166,7 @@ const MessageList = ({ locationStatus, coords, setLocationPermission, messages, 
           <div
             key={item.id || index}
             className="flex gap-4 bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-200 transform hover:-translate-y-1 animate-[fadeIn_0.5s_ease-out_forwards] opacity-0"
-            style={{ animationDelay: `${index * 0.1}s` }}
+            style={{ animationDelay: `${index * 0.002}s` }}
           >
             {true ? <MessageCard key={index} {...item} /> : <MessageCard2 key={index} {...item} />}
           </div>

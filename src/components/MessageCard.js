@@ -1,8 +1,31 @@
 import { useState, useEffect } from 'react';
 
+
+const linkifyText = (text) => {
+  const urlRegex = /(https?:\/\/[^\s]+)/g;
+  const parts = text.split(urlRegex);
+
+  return parts.map((part, index) =>
+    urlRegex.test(part) ? (
+      <a
+        key={index}
+        href={part}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-blue-500 underline break-words"
+      >
+        {part}
+      </a>
+    ) : (
+      <span key={index}>{part}</span>
+    )
+  );
+};
+
+
 const MessageCard = ({ message, inserted_at }) => {
   // message = "lianwiengioaiwbecabuwelcuiabwelfbalwjbvdlaebwclkjawbcjawebljkcbawlbvclajbvcjlabcjlhabcljhasbdjvbasvbdjldabvjbdvkasdjasvbdjhvbdhjvbd"
-  
+
   const [copied, setCopied] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const CHAR_LIMIT = 100;
@@ -32,7 +55,7 @@ const MessageCard = ({ message, inserted_at }) => {
 
       {/* Message text */}
       <pre className="whitespace-pre-wrap break-words text-gray-800 dark:text-gray-200">
-        {displayedMessage}
+        {linkifyText(displayedMessage)}
         {shouldTruncate && !expanded && '...'}
         {shouldTruncate && (
           <button
@@ -55,8 +78,8 @@ const MessageCard = ({ message, inserted_at }) => {
         onClick={handleCopy}
         aria-label="Copy text"
         className={`absolute top-3 right-3 p-1.5 rounded-md transition-all ${copied
-            ? 'text-green-500 bg-green-50 dark:bg-green-900/20'
-            : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+          ? 'text-green-500 bg-green-50 dark:bg-green-900/20'
+          : 'text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
           }`}
       >
         {copied ? (

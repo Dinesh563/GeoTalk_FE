@@ -102,7 +102,7 @@ const MessageSendBox = ({ locationStatus, coordinates, setMessages }) => {
         </div>
       )}
 
-      <div className="rounded-lg bottom-0 bg-white dark:bg-gray-900 px-4 pb-6 pt-2 z-10 w-full max-w-3xl mx-auto">
+      <div className="rounded-lg bottom-0 bg-white dark:bg-gray-900 px-4 pb-6 pt-4 z-10 w-full max-w-3xl mx-auto">
         <div className="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-4 border border-gray-100 dark:border-gray-700 transition-all duration-300">
           <form onSubmit={handleSubmit} className="space-y-3">
             <div className="relative">
