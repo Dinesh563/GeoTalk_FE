@@ -1,6 +1,6 @@
 // src/api/messages.js
 
-const BASE_URL = process.env.REACT_APP_API_BASE_URL || 'http://localhost:8443';
+const BASE_URL = process.env.BACKEND_BASE_URL || 'http://localhost:4000';
 const GetMessages = BASE_URL + '/msgs';
 const PutMessagePath = BASE_URL + '/PutMessage';
 
