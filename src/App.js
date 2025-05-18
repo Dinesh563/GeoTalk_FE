@@ -7,8 +7,9 @@ import MessageSendBox from './MessageSendBox';
 import AlertScroll from './components/AlertScroll';
 
 function App() {
-  const [locationStatus, setLocationStatus] = useState("Loading");
+  const [locationStatus, setLocationStatus] = useState("loading");
   const [coords, setCoords] = useState({ lat: null, lon: null });
+  const [messages, setMessages] = useState([]);
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -35,8 +36,8 @@ function App() {
     <div className="App">
       <Header locationStatus={locationStatus} coords={coords} />
       <AlertScroll message="Please note that the messages will be expired after 5 minutes"/>
-      <MessageList locationStatus={locationStatus} coords={coords} setLocationPermission={setLocationStatus} />
-      <MessageSendBox />
+      <MessageList locationStatus={locationStatus} coords={coords} setLocationPermission={setLocationStatus} messages={messages} setMessages={setMessages} />
+      <MessageSendBox locationStatus={locationStatus} coordinates={coords} setLocationPermission={setLocationStatus} setMessages={setMessages}/>
       <Footer />
     </div>
   );

@@ -1,23 +1,31 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import MessageCard from './components/MessageCard';
 import MessageCard2 from './components/MessageCard2';
 import Location from './components/Location';
+import { fetchMessages as fetchMessagesAPI } from './backend/api';
 
-const BASE_URL = 'http://localhost:8443'
-const GetMessages = BASE_URL + '/msgs'
-
-const MessageList = ({ locationStatus, coords, setLocationPermission }) => {
-  const [messages, setMessages] = useState([]);
+const MessageList = ({ locationStatus, coords, setLocationPermission, messages, setMessages }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  // const [locationPermission, setLocationPermission] = useState('loading'); // 'granted', 'denied', 'loading'
   const [coordinates, setCoordinates] = useState({ latitude: null, longitude: null });
+
+  // Fetch messages from API
+  const fetchMessages = useCallback(async (latitude, longitude) => {
+    try {
+      setIsLoading(true);
+      const data = await fetchMessagesAPI(latitude, longitude)
+      setMessages(data);
+      setError(null);
+    } catch (error) {
+      console.error('Error fetching messages:', error);
+      setError('Failed to load messages. Please try again later.');
+    } finally {
+      setIsLoading(false);
+    }
+  }, [setMessages])
 
   // permission and fetch coordinates
   useEffect(() => {
-    console.log("use hook running")
-
-
     if (locationStatus === 'granted') {
       setLocationPermission('granted');
       setCoordinates({ latitude: coords.lat, longitude: coords.lon });
@@ -27,36 +35,7 @@ const MessageList = ({ locationStatus, coords, setLocationPermission }) => {
       setIsLoading(false);
       setError('Location permission denied.');
     }
-  }, [locationStatus, coords, setLocationPermission]);
-
-  // Fetch messages from API
-  const fetchMessages = async (latitude, longitude) => {
-    try {
-      setIsLoading(true);
-      // Use the coordinates in the API call
-      const response = await fetch(`${GetMessages}?latitude=${latitude}&longitude=${longitude}`, {
-        method: 'GET',
-        headers: {
-          'Accept': 'application/json',
-          'Content-Type': 'application/json'
-        }
-      });
-
-      if (!response.ok) {
-        throw new Error(`Server responded with status: ${response.status}`);
-      }
-
-      const data = await response.json();
-    
-      setMessages(data);
-      setError(null);
-    } catch (error) {
-      console.error('Error fetching messages:', error);
-      setError('Failed to load messages. Please try again later.');
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  }, [locationStatus, coords, setLocationPermission, fetchMessages]);
 
   // Retry getting location
   const retryLocationPermission = () => {
@@ -166,7 +145,7 @@ const MessageList = ({ locationStatus, coords, setLocationPermission }) => {
           Messages Near You
         </h2>
 
-        <Location locationStatus={locationStatus}/>
+        <Location locationStatus={locationStatus} />
 
         <button
           className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-indigo-600 to-blue-500 text-white rounded-lg shadow-md hover:shadow-lg transition-all duration-200 transform hover:-translate-y-0.5 w-full sm:w-auto justify-center mt-2 sm:mt-0"
