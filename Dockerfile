@@ -1,20 +1,23 @@
-# Use the latest LTS version of Node.js
-FROM node:18-alpine
- 
-# Set the working directory inside the container
+# Build stage
+FROM node:18-alpine AS builder
+
 WORKDIR /app
- 
-# Copy package.json and package-lock.json
+
 COPY package*.json ./
- 
-# Install dependencies
 RUN npm install
- 
-# Copy the rest of your application files
+
 COPY . .
- 
-# Expose the port your app runs on
-EXPOSE 3000
- 
-# Define the command to run your app
-CMD ["npm", "start"]
+RUN npm run build
+
+# Serve stage
+FROM nginx:alpine
+
+# Copy the build output to Nginx's web root
+COPY --from=builder /app/build /usr/share/nginx/html
+
+# Optional: Remove default Nginx config and add custom config (if needed)
+# COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+EXPOSE 80
+
+CMD ["nginx", "-g", "daemon off;"]
